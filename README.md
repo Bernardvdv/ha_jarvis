@@ -2,7 +2,7 @@
 
 A full-featured, Jarvis-style Lovelace dashboard for Home Assistant. Dark sci-fi aesthetic with dot-grid backgrounds, animated corner brackets, Orbitron/Share Tech Mono fonts, and cyan accents.
 
-![Jarvis Dashboard Preview](docs/screenshots/overview.png)
+![Jarvis Dashboard Preview](docs/screenshots/j_dash.png)
 
 ## Features
 
