@@ -1,0 +1,241 @@
+# ============================================================
+# Jarvis Dashboard for Home Assistant
+# https://github.com/YOUR_GITHUB/jarvis-dashboard-ha
+#
+# SETUP:
+# 1. Copy /cards/ to /config/www/jarvis/ on your HA instance
+# 2. Register each .js file as a Lovelace resource:
+#      /local/jarvis/room-card.js          (module)
+#      /local/jarvis/control-card.js       (module)
+#      /local/jarvis/jarvis-navbar.js      (module)
+#      /local/jarvis/jarvis-card.js        (module)
+#      /local/jarvis/security-camera-card.js (module)
+#      /local/jarvis/battery-overview-card.js (module)
+#      /local/jarvis/music-centre-card.js  (module)
+#      /local/jarvis/home-status-bar.js    (module)
+# 3. Create a new dashboard and paste this YAML
+# 4. Find & replace all YOUR_* placeholders with your entity IDs
+#
+# PLACEHOLDERS — find and replace these:
+#   YOUR_DASHBOARD_PATH   e.g. dashboard-jarvis
+#   YOUR_TRV_ROOM         e.g. living_room (forms climate.YOUR_TRV_ROOM_trv)
+#   YOUR_FRONT_DOOR_LOCK  e.g. lock.lock_pro_d8
+#   YOUR_NEST_CLIMATE     e.g. climate.nest_trv
+#   YOUR_WEATHER          e.g. weather.forecast_home
+#   YOUR_CALENDAR         e.g. calendar.home
+#   YOUR_VIN              e.g. wf02xxerk2rr01378 (FordPass VIN)
+# ============================================================
+
+views:
+
+  # ── HOME VIEW ──────────────────────────────────────────────
+  - type: sections
+    title: Home
+    icon: mdi:home
+    max_columns: 4
+    cards: []
+    sections:
+      - type: grid
+        column_span: 3
+        cards:
+          - type: custom:home-status-bar
+            lights:
+              - light.YOUR_LIGHT_1
+              - light.YOUR_LIGHT_2
+              # Add all lights you want to monitor
+            climates:
+              - climate.YOUR_TRV_ROOM_trv
+              # Add all TRV entities
+            lock: YOUR_FRONT_DOOR_LOCK
+            car_lock: lock.YOUR_CAR_LOCK           # optional
+            car_fuel: sensor.YOUR_CAR_FUEL         # optional
+            alarm: sensor.YOUR_CAR_ALARM           # optional
+            printer: switch.YOUR_3D_PRINTER        # optional
+            robovac: vacuum.YOUR_ROBOVAC            # optional
+            dryer: binary_sensor.YOUR_DRYER        # optional
+
+      - type: grid
+        column_span: 1
+        cards:
+          - type: custom:clock-weather-card        # requires HACS: clock-weather-card
+            entity: weather.YOUR_WEATHER
+
+  # ── OVERVIEW VIEW ──────────────────────────────────────────
+  - type: panel
+    title: Overview
+    path: YOUR_DASHBOARD_PATH/overview
+    icon: mdi:view-dashboard
+    cards:
+      - type: custom:overview-card
+        rooms:
+          - name: Living Room
+            icon: mdi:sofa
+            climate_entity: climate.YOUR_TRV_ROOM_trv
+            temp_sensor: sensor.YOUR_TRV_ROOM_trv_local_temperature
+            lights:
+              - entity: light.YOUR_CEILING_LIGHT
+                name: Ceiling
+                icon: mdi:ceiling-light
+              - entity: light.YOUR_LAMP
+                name: Lamp
+                icon: mdi:floor-lamp
+            plugs: []
+          # Repeat for each room — Kitchen, Dining, Study, Bedroom, etc.
+          # See docs/room-card.md for full config reference
+
+        controls:
+          - type: custom:control-card
+            name: Heating
+            icon: mdi:thermostat
+            entity: YOUR_NEST_CLIMATE
+            entity_type: thermostat
+            temp_sensor: sensor.YOUR_NEST_CURRENT_TEMP
+          - type: custom:control-card
+            name: Front Door
+            entity: YOUR_FRONT_DOOR_LOCK
+            entity_type: lock
+            icon: mdi:door
+          - type: custom:control-card
+            name: Spare
+            icon: mdi:plus-circle-outline
+            entity_type: spare
+          - type: custom:control-card
+            name: Spare
+            icon: mdi:plus-circle-outline
+            entity_type: spare
+
+  # ── SECURITY VIEW ──────────────────────────────────────────
+  - type: panel
+    title: Security
+    path: YOUR_DASHBOARD_PATH/security
+    icon: mdi:security
+    cards:
+      - type: custom:security-camera-card
+        cameras:
+          - name: Garage
+            icon: mdi:garage
+            entity: camera.YOUR_GARAGE_CAMERA
+          - name: Driveway
+            icon: mdi:car
+            entity: camera.YOUR_DRIVEWAY_CAMERA
+          - name: Backyard
+            icon: mdi:tree
+            entity: camera.YOUR_BACKYARD_CAMERA
+        locks:
+          - entity: YOUR_FRONT_DOOR_LOCK
+            label: Front Door
+          - entity: lock.YOUR_CAR_LOCK          # optional
+            label: Car
+        sensors:
+          - entity: binary_sensor.YOUR_CONTACT_SENSOR_1
+            label: Contact 1
+            type: contact
+          - entity: binary_sensor.YOUR_GLASS_DOOR_SENSOR
+            label: Glass Door
+            type: glass
+          - entity: binary_sensor.YOUR_GARAGE_DOOR_SENSOR
+            label: Garage Door
+            type: garage
+        navbar:
+          - icon: mdi:home
+            url: /YOUR_DASHBOARD_PATH/0
+          - icon: mdi:view-dashboard
+            url: /YOUR_DASHBOARD_PATH/overview
+          - icon: mdi:security
+            url: /YOUR_DASHBOARD_PATH/security
+          - icon: mdi:car
+            url: /YOUR_DASHBOARD_PATH/vehicle
+          - icon: mdi:music
+            url: /YOUR_DASHBOARD_PATH/music
+          - icon: mdi:battery-30-bluetooth
+            url: /YOUR_DASHBOARD_PATH/battery
+          - icon: mdi:robot
+            url: /YOUR_DASHBOARD_PATH/jarvis
+
+  # ── MUSIC VIEW ─────────────────────────────────────────────
+  - type: sections
+    title: Music
+    path: YOUR_DASHBOARD_PATH/music
+    icon: mdi:music
+    max_columns: 4
+    cards: []
+    sections:
+      - type: grid
+        cards:
+          - type: custom:music-centre-card
+            speakers:
+              - entity: media_player.YOUR_SPEAKER_1
+                name: Living Room
+                icon: mdi:speaker
+              - entity: media_player.YOUR_SPEAKER_2
+                name: Kitchen
+                icon: mdi:google-home
+            radios:
+              - name: BBC Radio 1
+                icon: mdi:radio
+                url: https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one
+              - name: BBC Radio 2
+                icon: mdi:radio
+                url: https://stream.live.vc.bbcmedia.co.uk/bbc_radio_two
+              - name: BBC Radio 6
+                icon: mdi:radio
+                url: https://stream.live.vc.bbcmedia.co.uk/bbc_6music
+
+  # ── BATTERY VIEW ───────────────────────────────────────────
+  - type: panel
+    title: Batteries
+    path: YOUR_DASHBOARD_PATH/battery
+    icon: mdi:battery-alert
+    cards:
+      - type: custom:battery-overview-card
+        columns: 5
+        groups:
+          - name: TRVs
+            items:
+              - name: Living Room
+                entity: sensor.YOUR_TRV_ROOM_trv_battery
+              # Add all TRV battery sensors
+          - name: Security
+            items:
+              - name: Front Door Lock
+                entity: sensor.YOUR_LOCK_BATTERY
+              # Add all security device batteries
+          - name: Devices
+            items:
+              - name: Tablet
+                entity: sensor.YOUR_TABLET_BATTERY
+              # Add all device batteries
+
+  # ── JARVIS AI VIEW ─────────────────────────────────────────
+  - type: panel
+    title: Jarvis
+    path: YOUR_DASHBOARD_PATH/jarvis
+    icon: mdi:robot
+    cards:
+      - type: custom:jarvis-card
+        weather: weather.YOUR_WEATHER
+        calendar: calendar.YOUR_CALENDAR
+        outside_temp: sensor.YOUR_OUTSIDE_TEMP   # optional
+        lock: YOUR_FRONT_DOOR_LOCK
+        lights:
+          - light.YOUR_LIGHT_1
+          - light.YOUR_LIGHT_2
+          # All lights to include in the Jarvis overview
+        climates:
+          - climate.YOUR_TRV_ROOM_trv
+          # All TRV climate entities
+        energy:                                  # optional — Octopus Energy integration
+          demand: sensor.YOUR_ENERGY_DEMAND
+          consumption_today: sensor.YOUR_ENERGY_TODAY
+          cost_today: sensor.YOUR_ENERGY_COST
+          rate: sensor.YOUR_ENERGY_RATE
+          fossil_fuel: sensor.electricity_maps_grid_fossil_fuel_percentage
+        navbar:
+          - icon: mdi:home
+            url: /YOUR_DASHBOARD_PATH/0
+          - icon: mdi:view-dashboard
+            url: /YOUR_DASHBOARD_PATH/overview
+          - icon: mdi:security
+            url: /YOUR_DASHBOARD_PATH/security
+          - icon: mdi:robot
+            url: /YOUR_DASHBOARD_PATH/jarvis
